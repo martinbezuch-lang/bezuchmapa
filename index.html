@@ -139,8 +139,25 @@ tbody tr:hover{background:var(--accent-soft)}
 .icon-btn.on{background:rgba(250,204,21,.2);border-color:#facc15;color:#facc15}
 body.light .icon-btn.on{color:#a16207}
 .tags-line{margin-top:3px}
-.typ-tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:8px;white-space:nowrap;border:1px solid transparent}
-.typ-3{background:rgba(46,157,85,.14);color:#2e9d55;border-color:rgba(46,157,85,.35)}.typ-2{background:rgba(59,130,246,.14);color:#3b82f6;border-color:rgba(59,130,246,.35)}.typ-1{background:rgba(140,140,140,.14);color:#8a8a8a;border-color:rgba(140,140,140,.35)}
+.ti{display:inline-grid;place-items:center;width:20px;height:20px;padding:0;margin-left:6px;vertical-align:-4px;border:0;border-radius:50%;background:transparent;cursor:help}
+.ti:hover,.ti:focus-visible{background:var(--card2);outline:1px solid var(--line2)}
+.ti svg{display:block}
+.typ-3{color:#22a55a}.typ-2{color:#3b82f6}.typ-1{color:#9ca3af}
+#tip{position:fixed;z-index:9999;max-width:270px;padding:9px 11px;border-radius:10px;background:var(--card);color:var(--text);border:1px solid var(--line2);box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:12.5px;line-height:1.45;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s}
+#tip.show{opacity:1;transform:none}
+#tip b{font-weight:700}
+#tip .tip-sub{color:var(--text2);font-size:11.5px;margin-top:4px}
+#tip .tip-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:6px 0 3px;background:var(--line2)}
+#tip .tip-bar i{display:block;background:#22a55a}#tip .tip-bar i+i{background:#ef4444}
+.rate{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.rate-btn{width:28px;height:26px;display:inline-grid;place-items:center;padding:0;border-radius:7px;border:1px solid var(--line2);background:var(--card2);cursor:pointer;font-size:13px;filter:grayscale(1);opacity:.75}
+.rate-btn:hover{opacity:1;filter:none}
+.rate-btn.on{filter:none;opacity:1}
+.rate-btn.on.up{background:rgba(34,165,90,.18);border-color:#22a55a}.rate-btn.on.down{background:rgba(239,68,68,.16);border-color:#ef4444}
+.rate-bar{position:relative;width:46px;height:8px;border-radius:4px;overflow:hidden;background:var(--line2);cursor:help;border:0;padding:0;display:flex}
+.rate-bar i{display:block;height:100%;background:#22a55a}.rate-bar i+i{background:#ef4444}
+.rate-bar.none{background:repeating-linear-gradient(90deg,var(--line2) 0 4px,transparent 4px 7px)}
+.rate-n{font-size:11px;color:var(--text2);min-width:16px;font-variant-numeric:tabular-nums}
 .avail-tag{display:inline-block;margin-left:6px;font-size:11px;padding:1px 6px;border-radius:8px;background:#fff4e0;color:#8a5a00;border:1px solid #f0d49a;white-space:nowrap}
 .warn-tag{color:var(--warn);font-size:11.5px;font-weight:600}
 .empty{text-align:center;padding:28px;color:var(--text2)}
@@ -155,6 +172,7 @@ body.light .icon-btn.on{color:#a16207}
   td.c-sub::before{content:" · "}
   td.c-cat{margin:6px 0 4px}
   td.c-acts{margin-top:8px}
+  td.c-rate{margin-top:6px}
   .site-header{position:static}
   .header-inner{padding:10px 14px}
   .container{padding:14px 12px 40px}
@@ -317,9 +335,10 @@ footer{max-width:1200px;margin:0 auto;padding:0 20px 30px;font-size:12px;color:v
           <th><button type="button" data-sort="country">Krajina <span aria-hidden="true"></span></button></th>
           <th><button type="button" data-sort="city">Mesto / región <span aria-hidden="true"></span></button></th>
           <th><button type="button" data-sort="cat">Kategória <span aria-hidden="true"></span></button></th>
+          <th><button type="button" data-sort="rating" title="Ako dobre video ukazuje toto miesto — hodnotia diváci">Hodnotenie <span aria-hidden="true"></span></button></th>
           <th><span class="sr-only">Akcie</span></th>
         </tr></thead>
-        <tbody id="tbody"><tr><td colspan="5" class="empty" id="js-warning">Načítavam lokality… Ak tento text nezmizne, stránka je otvorená v náhľade, ktorý blokuje skripty (napr. priamo v aplikácii Claude). Súbor <b>index.html</b> si stiahni a otvor dvojklikom v prehliadači Chrome, Edge alebo Safari.</td></tr></tbody>
+        <tbody id="tbody"><tr><td colspan="6" class="empty" id="js-warning">Načítavam lokality… Ak tento text nezmizne, stránka je otvorená v náhľade, ktorý blokuje skripty (napr. priamo v aplikácii Claude). Súbor <b>index.html</b> si stiahni a otvor dvojklikom v prehliadači Chrome, Edge alebo Safari.</td></tr></tbody>
       </table>
     </div>
     <div class="pager">
@@ -332,7 +351,7 @@ footer{max-width:1200px;margin:0 auto;padding:0 20px 30px;font-size:12px;color:v
 <footer id="footer"></footer>
 
 <script id="embedded-csv" type="text/csv">
-Názov,Krajina,Mesto / Región,Kategória,Podkategória,Video,Lat,Lng,Čas,Cena za noc,Dĺžka (min),Typ záberu,Dostupnosť
+﻿Názov,Krajina,Mesto / Región,Kategória,Podkategória,Video,Lat,Lng,Čas,Cena za noc,Dĺžka (min),Typ záberu,Dostupnosť
 BahaSea Backpackers Hostel,Bahamy,Nassau,Ubytovanie,Hostel / Guesthouse,https://youtu.be/jRqv6yUwdiE?t=13,"25,0769251","-77,4272345",0:00:13,,"9,8",Detailná návšteva,
 BahaSea Backpackers Hostel,Bahamy,Nassau,Ubytovanie,Hostel / Guesthouse,https://youtu.be/nC1xmTFWmSM?t=1107,"25,0769251","-77,4272345",0:18:27,,"1,6",Krátka zastávka,
 Downtown Nassau,Bahamy,Nassau,Mestá a nákupy,Mesto / Štvrť,https://youtu.be/jRqv6yUwdiE?t=657,"25,0777669","-77,3374677",0:10:57,,"1,1",Krátka zastávka,
@@ -1673,7 +1692,8 @@ Sopka hotela Mirage (show),USA,Las Vegas,Atrakcie a výhľady,Zábavný park,htt
 /* ================= NASTAVENIA ================= */
 const CONFIG = {
   csvUrl: 'lokality.csv',                  // ak súbor leží vedľa index.html, načíta sa namiesto vloženej kópie
-  maxRouteStops: 10
+  maxRouteStops: 10,
+  votes: { url: 'https://svcukiznfrfmwahyvavf.supabase.co', key: 'sb_publishable_ZKT0Y3MsVpCPhDfDZdPk0w_xta_AiWn' }            // Supabase: url projektu + anon (public) kľúč → spoločné hodnotenia 👍/👎
 };
 
 const COUNTRIES = { // názov → [ISO kód, lat min, lat max, lng min, lng max]
@@ -1777,16 +1797,28 @@ function parseVideo(url) {
 const num = v => { const n = parseFloat(String(v ?? '').trim().replace(',', '.')); return Number.isFinite(n) ? n : null; };
 
 const TYPES = {
-  'Detailná návšteva': { icon: '🎥', rank: 3, hint: 'Miestu sa venujem dlhšie (viac ako 3 min)' },
-  'Krátka zastávka': { icon: '⏱️', rank: 2, hint: 'Krátka zastávka (1–3 min)' },
-  'Prechádzam okolo': { icon: '👀', rank: 1, hint: 'Iba prechádzam okolo – miesto je len krátko v zábere' }
+  'Detailná návšteva': { icon: '🎥', rank: 3, hint: 'Miestu sa vo videu venujem dlhšie (viac ako 3 minúty) — uvidíš ho podrobne.' },
+  'Krátka zastávka': { icon: '⏱️', rank: 2, hint: 'Krátka zastávka (zhruba 1–3 minúty) — základná predstava o mieste.' },
+  'Prechádzam okolo': { icon: '👀', rank: 1, hint: 'Miesto je v zábere len chvíľu, keď okolo neho prechádzam.' }
 };
 function TYPES_ALIAS(t) { const f = fold(t); return Object.keys(TYPES).find(k => fold(k) === f) || ''; }
+function typeIcon(rank, size = 14) { // koláčik: plný = dlho, polovica = krátko, výsek = len okolo
+  const r = size / 2 - 1.2, c = size / 2, f = rank === 3 ? 1 : rank === 2 ? .5 : .2;
+  let wedge;
+  if (f >= 1) wedge = `<circle cx="${c}" cy="${c}" r="${r}" fill="currentColor"/>`;
+  else { const a = 2 * Math.PI * f, x = c + r * Math.sin(a), y = c - r * Math.cos(a);
+    wedge = `<path d="M${c} ${c}L${c} ${c - r}A${r} ${r} 0 ${f > .5 ? 1 : 0} 1 ${x.toFixed(2)} ${y.toFixed(2)}Z" fill="currentColor"/>`; }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="currentColor" stroke-width="1.4"/>${wedge}</svg>`;
+}
+function typeTip(v) {
+  const T = TYPES[v.typ];
+  const d = v.dur, fits = d != null && (T.rank === 3 ? d > 3 : T.rank === 2 ? d >= 1 && d <= 3 : d < 1);
+  return `<b>${esc(v.typ)}</b>${fits ? ` · približne ${d < 1 ? 'menej ako 1' : Math.round(d)} min vo videu` : ''}<div class="tip-sub">${esc(T.hint)}</div>`;
+}
 function typeTag(v) {
   if (!v || !v.typ) return '';
   const T = TYPES[v.typ];
-  const d = v.dur, fits = d != null && (T.rank === 3 ? d > 3 : T.rank === 2 ? d >= 1 && d <= 3 : d < 1);
-  return `<span class="typ-tag typ-${T.rank}" title="${esc(T.hint)}">${T.icon} ${esc(v.typ)}${fits ? ` · ~${d < 1 ? '<1' : Math.round(d)} min` : ''}</span>`;
+  return `<button type="button" class="ti typ-${T.rank}" data-tip="${esc(typeTip(v))}" aria-label="${esc(v.typ)}">${typeIcon(T.rank)}</button>`;
 }
 function buildPlaces(csvText) {
   const rows = parseCsv(csvText);
@@ -1872,7 +1904,7 @@ function activeList() {
 function sortedList() {
   const f = state.sortField, d = state.sortDir;
   return activeList().sort((a, b) => {
-    const c = f === 'videos' ? (a.videos.length - b.videos.length) : String(a[f] || '').localeCompare(String(b[f] || ''), 'sk', { sensitivity: 'base' });
+    const c = f === 'videos' ? (a.videos.length - b.videos.length) : f === 'rating' ? (Votes.score(a) - Votes.score(b)) : String(a[f] || '').localeCompare(String(b[f] || ''), 'sk', { sensitivity: 'base' });
     return c * d || a.name.localeCompare(b.name, 'sk');
   });
 }
@@ -1921,7 +1953,7 @@ function renderFilters() {
   } else { subBox.classList.remove('show'); $('sub-tags').innerHTML = ''; }
 
   const ty = Object.keys(TYPES).map(t => [t, base.filter(p => p.typ === t).length]).filter(x => x[1] > 0);
-  renderTags($('type-tags'), ty, state.types, t => `<span aria-hidden="true">${TYPES[t].icon}</span>`);
+  renderTags($('type-tags'), ty, state.types, t => `<span class="typ-${TYPES[t].rank}" style="display:inline-flex" title="${esc(TYPES[t].hint)}">${typeIcon(TYPES[t].rank, 13)}</span>`);
   $('reset-btn').hidden = !(state.countries.size || state.cities.size || state.cats.size || state.subs.size || state.types.size || state.onlyStarred || state.query);
 }
 function renderTags(wrap, items, set, prefix, onChange) {
@@ -1944,7 +1976,7 @@ function videoChips(p, max) {
 function nameLink(p) {
   const v = p.videos[0];
   if (!v) return `<div class="loc-name">${esc(p.name)}</div>`;
-  return `<a class="loc-name loc-link" href="${esc(v.url)}" target="_blank" rel="noopener" title="Pozrieť vo videu (${fmtTime(v.t)})">${esc(p.name)} <span class="play" aria-hidden="true">▶</span></a>${availTag(v)}<div class="tags-line">${typeTag(v)}</div>`;
+  return `<a class="loc-name loc-link" href="${esc(v.url)}" target="_blank" rel="noopener" title="Pozrieť vo videu (${fmtTime(v.t)})">${esc(p.name)} <span class="play" aria-hidden="true">▶</span></a>${typeTag(v)}${availTag(v)}`;
 }
 function availTag(v) {
   if (!v || !v.av) return '';
@@ -1953,7 +1985,7 @@ function availTag(v) {
 }
 function moreVideos(p) {
   if (p.videos.length < 2) return '';
-  return `<div class="more-vids"><span>aj v ďalších videách:</span> ${p.videos.slice(1).map(v => `<a href="${esc(v.url)}" target="_blank" rel="noopener"${v.av || v.typ ? ` title="${esc([v.typ, v.av].filter(Boolean).join(' · '))}"` : ''}>▶ ${fmtTime(v.t)}${v.typ ? ' ' + TYPES[v.typ].icon : ''}${v.av ? ' ⚠' : ''}</a>`).join(' ')}</div>`;
+  return `<div class="more-vids"><span>aj v ďalších videách:</span> ${p.videos.slice(1).map(v => `<a href="${esc(v.url)}" target="_blank" rel="noopener"${v.av || v.typ ? ` title="${esc([v.typ, v.av].filter(Boolean).join(' · '))}"` : ''}>▶ ${fmtTime(v.t)}${v.typ ? ` <span class="typ-${TYPES[v.typ].rank}" style="vertical-align:-2px">${typeIcon(TYPES[v.typ].rank, 11)}</span>` : ''}${v.av ? ' ⚠' : ''}</a>`).join(' ')}</div>`;
 }
 function isStay(p) { return p.cat === 'Ubytovanie'; }
 function pricesUrl(p) { return 'https://www.google.com/travel/hotels?q=' + encodeURIComponent([p.name, p.city, p.country].filter(Boolean).join(' ')); }
@@ -1981,12 +2013,13 @@ function renderTable() {
       <td class="c-country">${flagImg(p.country)} ${esc(p.country)}</td>
       <td class="c-city">${esc(p.city || '—')}</td>
       <td class="c-cat"><span class="cat" style="${catColor(p.cat)}">${CATEGORIES[p.cat] ? CATEGORIES[p.cat][0] + ' ' : ''}${esc(p.cat)}</span>${p.sub ? `<div class="sub">${esc(p.sub)}</div>` : ''}</td>
+      <td class="c-rate">${rateCell(p)}</td>
       <td class="c-acts"><div class="acts">
         <button type="button" class="icon-btn" data-focus="${p.id}" title="Ukázať na mape" aria-label="Ukázať ${esc(p.name)} na mape" ${p.gpsOk ? '' : 'disabled'}>📌</button>
         <a class="icon-btn" href="${esc(gmapsUrl(p))}" target="_blank" rel="noopener" title="Otvoriť v Google Maps" aria-label="Otvoriť ${esc(p.name)} v Google Maps">🗺️</a>
         <button type="button" class="icon-btn ${on ? 'on' : ''}" data-star="${p.id}" aria-pressed="${on}" title="${on ? 'Odobrať z itinerára' : 'Pridať do itinerára'}" aria-label="${on ? 'Odobrať z itinerára' : 'Pridať do itinerára'}: ${esc(p.name)}">${on ? '★' : '☆'}</button>
       </div></td></tr>`;
-  }).join('') : `<tr><td colspan="5" class="empty">Nič sa nenašlo. Skús zrušiť niektorý filter.</td></tr>`;
+  }).join('') : `<tr><td colspan="6" class="empty">Nič sa nenašlo. Skús zrušiť niektorý filter.</td></tr>`;
 
   $('page-info').textContent = list.length ? `Strana ${state.page} z ${pages}` : '';
   const pg = $('pages'); pg.innerHTML = '';
@@ -2239,7 +2272,7 @@ function bind() {
   });
   document.querySelectorAll('th button').forEach(b => b.onclick = () => {
     const f = b.dataset.sort;
-    state.sortDir = state.sortField === f ? -state.sortDir : (f === 'videos' ? -1 : 1);
+    state.sortDir = state.sortField === f ? -state.sortDir : (f === 'videos' || f === 'rating' ? -1 : 1);
     state.sortField = f; renderTable();
   });
   $('page-size').onchange = e => { state.pageSize = e.target.value === 'all' ? 'all' : +e.target.value; state.page = 1; renderTable(); };
@@ -2274,6 +2307,93 @@ function bind() {
 
 }
 
+/* ================= HODNOTENIE (👍/👎) =================
+   Bez nastaveného servera sa hlas uloží len v tomto prehliadači.
+   Spoločné počty: v CONFIG.votes vyplň url a anon kľúč projektu Supabase (projekt mas-rad, objekty bm_votes / bm_vote / bm_tallies). */
+const Votes = {
+  tally: new Map(), mine: store.get('bm_votes', {}),
+  voter: store.get('bm_voter', null) || (() => { const id = (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () => (Math.random() * 16 | 0).toString(16))); store.set('bm_voter', id); return id; })(),
+  get on() { return !!(CONFIG.votes && CONFIG.votes.url && CONFIG.votes.key); },
+  key(p) { return p.vk || (p.vk = hashId(fold(p.name) + '|' + fold(p.country))); },
+  hdr() { return { apikey: CONFIG.votes.key, 'Content-Type': 'application/json' }; },
+  counts(p) {
+    const k = this.key(p), t = this.tally.get(k) || { up: 0, down: 0 }, m = this.mine[k] || 0;
+    if (this.on) return { up: t.up, down: t.down, mine: m };
+    return { up: m === 1 ? 1 : 0, down: m === -1 ? 1 : 0, mine: m };
+  },
+  score(p) { const c = this.counts(p), n = c.up + c.down; return n ? (c.up + 1) / (n + 2) + n / 1e6 : -1; },
+  async load() {
+    if (!this.on) return;
+    try {
+      const r = await fetch(CONFIG.votes.url + '/rest/v1/rpc/bm_tallies', { method: 'POST', headers: this.hdr(), body: '{}' });
+      if (r.ok) for (const t of await r.json()) this.tally.set(t.k, { up: t.up, down: t.down });
+    } catch (e) { console.warn('Hodnotenia sa nenačítali', e); }
+  },
+  async cast(p, v) {
+    const k = this.key(p), old = this.mine[k] || 0, nv = old === v ? 0 : v;
+    const t = this.tally.get(k) || { up: 0, down: 0 };
+    if (old === 1) t.up--; if (old === -1) t.down--; if (nv === 1) t.up++; if (nv === -1) t.down++;
+    this.tally.set(k, t);
+    if (nv) this.mine[k] = nv; else delete this.mine[k];
+    store.set('bm_votes', this.mine);
+    if (this.on) {
+      try { await fetch(CONFIG.votes.url + '/rest/v1/rpc/bm_vote', { method: 'POST', headers: this.hdr(), body: JSON.stringify({ p_k: k, p_voter: this.voter, p_v: nv }) }); }
+      catch (e) { console.warn('Hlas sa neodoslal', e); }
+    }
+  }
+};
+function rateTip(p) {
+  const c = Votes.counts(p), n = c.up + c.down;
+  const head = `<b>Kvalita informácií vo videu</b><div class="tip-sub">Ukázalo ti video o tomto mieste to, čo si potreboval vedieť?</div>`;
+  if (!n) return head + `<div class="tip-sub">Zatiaľ bez hodnotenia — buď prvý 👍 / 👎</div>`;
+  const pu = Math.round(c.up / n * 100);
+  return head + `<div class="tip-bar"><i style="width:${pu}%"></i><i style="width:${100 - pu}%"></i></div>👍 ${c.up} · 👎 ${c.down} — <b>${pu} %</b> kladných${c.mine ? `<div class="tip-sub">Tvoj hlas: ${c.mine > 0 ? '👍' : '👎'} (opätovným klikom ho zrušíš)</div>` : ''}${Votes.on ? '' : '<div class="tip-sub">Ukážka — hlas je zatiaľ uložený len v tvojom prehliadači.</div>'}`;
+}
+function rateCell(p) {
+  const c = Votes.counts(p), n = c.up + c.down, pu = n ? Math.round(c.up / n * 100) : 0;
+  return `<div class="rate" data-rate-wrap="${p.id}">
+    <button type="button" class="rate-btn up ${c.mine === 1 ? 'on' : ''}" data-vote="1" data-pid="${p.id}" aria-pressed="${c.mine === 1}" aria-label="Video dobre ukazuje ${esc(p.name)}">👍</button>
+    <button type="button" class="rate-bar ${n ? '' : 'none'}" data-tip="${esc(rateTip(p))}" aria-label="Hodnotenie: ${c.up} kladných, ${c.down} záporných">${n ? `<i style="width:${pu}%"></i><i style="width:${100 - pu}%"></i>` : ''}</button>
+    <button type="button" class="rate-btn down ${c.mine === -1 ? 'on' : ''}" data-vote="-1" data-pid="${p.id}" aria-pressed="${c.mine === -1}" aria-label="Video málo ukazuje ${esc(p.name)}">👎</button>
+    <span class="rate-n" title="Počet hlasov">${n || ''}</span>
+  </div>`;
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-vote]'); if (!b) return;
+  const p = state.byId.get(b.dataset.pid); if (!p) return;
+  const pr = Votes.cast(p, +b.dataset.vote);
+  const w = b.closest('[data-rate-wrap]'); if (w) w.outerHTML = rateCell(p);
+  Tip.hide(); await pr;
+});
+
+/* ================= BUBLINA (hover / klik / dotyk) ================= */
+const Tip = {
+  el: null, cur: null, pinned: false,
+  init() {
+    this.el = document.createElement('div'); this.el.id = 'tip'; this.el.setAttribute('role', 'tooltip'); document.body.appendChild(this.el);
+    const fine = matchMedia('(hover: hover)').matches;
+    document.addEventListener('mouseover', e => { if (!fine || this.pinned) return; const t = e.target.closest('[data-tip]'); if (t) this.show(t); });
+    document.addEventListener('mouseout', e => { if (!fine || this.pinned) return; const t = e.target.closest('[data-tip]'); if (t && !t.contains(e.relatedTarget)) this.hide(); });
+    document.addEventListener('focusin', e => { const t = e.target.closest('[data-tip]'); if (t && e.target.matches(':focus-visible')) this.show(t); });
+    document.addEventListener('focusout', () => { if (!this.pinned) this.hide(); });
+    document.addEventListener('click', e => {
+      const t = e.target.closest('[data-tip]');
+      if (t) { if (this.pinned && this.cur === t) this.hide(); else { this.show(t); this.pinned = true; } }
+      else if (this.pinned) this.hide();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') this.hide(); });
+    window.addEventListener('scroll', () => this.hide(), { passive: true });
+  },
+  show(t) {
+    this.cur = t; this.el.innerHTML = t.dataset.tip; this.el.classList.add('show');
+    const r = t.getBoundingClientRect(), w = this.el.offsetWidth, h = this.el.offsetHeight;
+    let x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), y = r.top - h - 8;
+    if (y < 8) y = r.bottom + 8;
+    this.el.style.left = x + 'px'; this.el.style.top = y + 'px';
+  },
+  hide() { this.pinned = false; this.cur = null; if (this.el) this.el.classList.remove('show'); }
+};
+
 async function loadData() {
   // 1) lokality.csv vedľa stránky (ľahká aktualizácia), 2) vložená kópia
   if (location.protocol.startsWith('http') && CONFIG.csvUrl) {
@@ -2287,10 +2407,11 @@ async function loadData() {
 
 document.addEventListener('DOMContentLoaded', async () => {
   setTheme(store.get('mbsk_theme', 'dark') === 'light');
-  bind();
+  bind(); Tip.init();
   try { await loadData(); }
   catch (e) { showStatus('Nepodarilo sa načítať dáta: ' + e.message, true); }
   try { loadSharedFromHash(); } catch (e) {}
+  Votes.load().then(() => { if (Votes.on) renderTable(); });
   // najprv zoznam a filtre — tie nesmú závisieť od mapy
   try { renderFilters(); renderTable(); renderItinerary(); }
   catch (e) { showStatus('Chyba pri zobrazení zoznamu: ' + e.message, true); console.error(e); }

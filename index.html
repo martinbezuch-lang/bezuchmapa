@@ -110,6 +110,22 @@ button,input,select,textarea{font:inherit;color:inherit}
 .share.open{display:flex}
 
 .table-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12.5px;color:var(--text2)}
+.map-lang{display:inline-flex;align-items:center;gap:4px;font-size:13px}
+.map-lang.off{opacity:.45}
+#welcome{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(5,10,20,.62);backdrop-filter:blur(3px)}
+#welcome.open{display:flex}
+.wl-box{position:relative;width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--card);color:var(--text);border:1px solid var(--line2);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.45);padding:24px 24px 18px}
+.wl-box h2{margin:0 0 4px;font-size:21px}
+.wl-box .wl-lead{margin:0 0 14px;color:var(--text2);font-size:14px;line-height:1.55}
+.wl-box p{font-size:14px;line-height:1.55;margin:0 0 12px}
+.wl-list{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:7px;font-size:13.5px;line-height:1.45}
+.wl-list li{display:flex;gap:10px}.wl-list li span:first-child{flex:0 0 20px;text-align:center}
+.wl-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:14px}
+.wl-actions .row{display:flex;gap:8px;flex-wrap:wrap}
+.wl-check{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text2);cursor:pointer}
+.wl-close{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;border:0;background:transparent;color:var(--text2);font-size:20px;cursor:pointer}
+.wl-close:hover{background:var(--card2);color:var(--text)}
+.btn.primary-solid{background:#e11d48;border-color:#e11d48;color:#fff}
 select{padding:5px 8px;border-radius:8px;border:1px solid var(--line2);background:var(--input);font-size:12.5px}
 .table-wrap{border:1px solid var(--line);border-radius:12px;overflow:hidden}
 table{width:100%;border-collapse:collapse}
@@ -196,6 +212,27 @@ footer{max-width:1200px;margin:0 auto;padding:0 20px 30px;font-size:12px;color:v
 </style>
 </head>
 <body>
+<div id="welcome" role="dialog" aria-modal="true" aria-labelledby="wl-title">
+  <div class="wl-box">
+    <button type="button" class="wl-close" id="wl-x" aria-label="Zavrieť">×</button>
+    <h2 id="wl-title">Ahoj, vitaj! 👋</h2>
+    <p class="wl-lead">Som <b>Martin Bezuch</b> a na YouTube točím vlogy z ciest po celom svete — od Thajska a Vietnamu cez Bangladéš až po Ameriku a Karibik.</p>
+    <p>Na tejto stránke nájdeš takmer všetky miesta, ktoré sa v mojich vlogoch objavili — <b id="wl-count">vyše 1 200 miest</b> na jednej mape. Čo tu môžeš robiť:</p>
+    <ul class="wl-list">
+      <li><span>▶</span><span><b>Pozrieť si miesto priamo vo videu</b> — jeden klik ťa pustí presne na chvíľu, keď som tam.</span></li>
+      <li><span>🔎</span><span><b>Filtrovať</b> podľa krajiny, mesta či kategórie — ubytovanie, jedlo, pláže, pamiatky…</span></li>
+      <li><span>⭐</span><span><b>Poskladať si vlastný itinerár</b> — ulož si obľúbené miesta, zdieľaj ich s kamarátmi alebo otvor trasu v Google Maps.</span></li>
+      <li><span>👍</span><span><b>Ohodnotiť</b>, či ti video o danom mieste pomohlo.</span></li>
+    </ul>
+    <div class="wl-actions">
+      <label class="wl-check"><input type="checkbox" id="wl-hide"> Nabudúce nezobrazovať</label>
+      <div class="row">
+        <a class="btn yt" href="https://www.youtube.com/@MartinBezuchSK" target="_blank" rel="noopener">▶ Môj YouTube kanál</a>
+        <button type="button" class="btn primary-solid" id="wl-go">Poďme na to!</button>
+      </div>
+    </div>
+  </div>
+</div>
 <header class="site-header">
   <div class="header-inner">
     <div class="brand">
@@ -212,6 +249,7 @@ footer{max-width:1200px;margin:0 auto;padding:0 20px 30px;font-size:12px;color:v
     </label>
     <div class="header-actions">
       <a class="btn yt" href="https://www.youtube.com/@MartinBezuchSK" target="_blank" rel="noopener">▶ YouTube kanál</a>
+      <button type="button" class="btn" id="about-btn" aria-label="O stránke" title="O stránke">ℹ️</button>
       <button type="button" class="btn" id="theme-btn" aria-label="Prepnúť svetlý / tmavý režim">☀️</button>
     </div>
   </div>
@@ -278,6 +316,15 @@ footer{max-width:1200px;margin:0 auto;padding:0 20px 30px;font-size:12px;color:v
           <button type="button" class="btn sm" data-tiles="classic" aria-pressed="true">Klasická</button>
           <button type="button" class="btn sm" data-tiles="satellite" aria-pressed="false">Satelitná</button>
         </div>
+        <label class="map-lang" title="V akom jazyku sa na mape zobrazia názvy krajín, miest a ulíc">🌐 <span class="sr-only">Jazyk mapy</span>
+          <select id="map-lang">
+            <option value="sk">Slovensky</option>
+            <option value="cs">Česky</option>
+            <option value="en">English</option>
+            <option value="de">Deutsch</option>
+            <option value="local">Miestny jazyk</option>
+          </select>
+        </label>
         <div class="seg" role="group" aria-label="Veľkosť mapy">
           <button type="button" class="btn sm" data-size="normal" aria-pressed="true">Štandard</button>
           <button type="button" class="btn sm" data-size="large" aria-pressed="false">Veľká</button>
@@ -1874,7 +1921,7 @@ const state = {
   onlyStarred: false, sharedIds: null,
   countrySort: 'count', sortField: 'country', sortDir: 1, page: 1, pageSize: 30,
   starred: new Set(store.get('mbsk_itinerary', [])),
-  tiles: store.get('mbsk_tiles', 'classic'), cluster: true, showGray: true, mapSize: 'normal'
+  tiles: store.get('mbsk_tiles', 'classic'), mapLang: store.get('mbsk_maplang', 'sk'), cluster: true, showGray: true, mapSize: 'normal'
 };
 const saveStarred = () => store.set('mbsk_itinerary', [...state.starred]);
 
@@ -2064,10 +2111,50 @@ function makeLayers() {
   grayLayer = mk('mc-gray'); blueLayer = mk('mc-blue');
   map.addLayer(grayLayer); map.addLayer(blueLayer);
 }
+/* Vektorová mapa (OpenFreeMap) – názvy v zvolenom jazyku; pri chybe sa použijú bežné dlaždice */
+const GL = { css: 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css', js: 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js',
+  bridge: 'https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js', style: 'https://tiles.openfreemap.org/styles/liberty',
+  attr: '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
+  ready: null, style0: null, failed: false };
+function loadAsset(tag, attrs) { return new Promise((ok, ko) => { const e = document.createElement(tag); Object.assign(e, attrs); e.onload = ok; e.onerror = () => ko(new Error('load ' + (attrs.src || attrs.href))); document.head.appendChild(e); }); }
+function glReady() {
+  if (!GL.ready) GL.ready = (async () => {
+    const c = document.createElement('canvas'); if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('WebGL nie je k dispozícii');
+    await Promise.all([loadAsset('link', { rel: 'stylesheet', href: GL.css }), loadAsset('script', { src: GL.js })]);
+    await loadAsset('script', { src: GL.bridge });
+    const r = await fetch(GL.style); if (!r.ok) throw new Error('style ' + r.status);
+    GL.style0 = await r.json();
+  })();
+  return GL.ready;
+}
+function langStyle(lang) {
+  const st = JSON.parse(JSON.stringify(GL.style0));
+  const name = lang === 'local' ? ['get', 'name']
+    : ['coalesce', ['get', 'name:' + lang], ...(lang === 'en' ? [] : [['get', 'name:en']]), ['get', 'name:latin'], ['get', 'name']];
+  for (const l of st.layers) if (l.layout && l.layout['text-field']) l.layout['text-field'] = name;
+  return st;
+}
+function setMapLang(lang) {
+  state.mapLang = ['sk', 'cs', 'en', 'de', 'local'].includes(lang) ? lang : 'sk'; store.set('mbsk_maplang', state.mapLang);
+  if ($('map-lang')) $('map-lang').value = state.mapLang;
+  if (map && state.tiles === 'classic') setTiles('classic');
+}
 function setTiles(mode) {
   state.tiles = (mode === 'satellite') ? 'satellite' : 'classic'; store.set('mbsk_tiles', state.tiles);
   document.querySelectorAll('[data-tiles]').forEach(b => b.setAttribute('aria-pressed', b.dataset.tiles === state.tiles));
+  const ml = document.querySelector('.map-lang'); if (ml) ml.classList.toggle('off', state.tiles !== 'classic');
   if (!map) return;
+  const token = (setTiles.n = (setTiles.n || 0) + 1);
+  if (state.tiles === 'classic' && !GL.failed && location.protocol.startsWith('http')) {
+    glReady().then(() => {
+      if (token !== setTiles.n) return;
+      const layer = L.maplibreGL({ style: langStyle(state.mapLang), attribution: GL.attr });
+      if (tileLayer) map.removeLayer(tileLayer);
+      tileLayer = layer.addTo(map);
+    }).catch(e => { console.warn('Vektorová mapa nejde, použijem bežnú:', e); GL.failed = true; if (token === setTiles.n) setTiles('classic'); });
+    if (!tileLayer) { tileLayer = L.tileLayer(TILES.classicBackup[0], { attribution: TILES.classicBackup[1], maxZoom: 19 }).addTo(map); } // kým sa načíta
+    return;
+  }
   if (tileLayer) map.removeLayer(tileLayer);
   const add = key => {
     const [url, attr] = TILES[key];
@@ -2260,6 +2347,9 @@ function bind() {
   $('subs-clear').onclick = () => { state.subs.clear(); state.page = 1; refresh({ fit: true }); };
   $('cities-clear').onclick = () => { state.cities.clear(); state.page = 1; refresh({ fit: true }); };
   document.querySelectorAll('[data-tiles]').forEach(b => b.onclick = () => setTiles(b.dataset.tiles));
+  $('map-lang').value = state.mapLang;
+  $('map-lang').onchange = e => { if (state.tiles !== 'classic') setTiles('classic'); setMapLang(e.target.value); };
+  $('about-btn').onclick = () => Welcome.open(true);
   document.querySelectorAll('[data-size]').forEach(b => b.onclick = () => setMapSize(b.dataset.size));
   $('gray-btn').onclick = e => { state.showGray = !state.showGray; e.currentTarget.setAttribute('aria-pressed', state.showGray); renderMap(); };
   $('fit-btn').onclick = () => { const pts = activeList().filter(p => p.gpsOk).map(p => [p.lat, p.lng]); setMapSize(state.mapSize === 'hide' ? 'normal' : state.mapSize); fitTo(pts); };
@@ -2394,6 +2484,26 @@ const Tip = {
   hide() { this.pinned = false; this.cur = null; if (this.el) this.el.classList.remove('show'); }
 };
 
+const Welcome = {
+  open(manual) {
+    const w = $('welcome'); if (!w) return;
+    $('wl-hide').checked = !!store.get('mbsk_welcome_off', false);
+    const n = state.places ? state.places.length : 0;
+    if (n) $('wl-count').textContent = `${n.toLocaleString('sk-SK')} miest z ${new Set(state.places.map(p => p.country)).size} krajín`;
+    w.classList.add('open'); this.prev = document.activeElement; $('wl-go').focus();
+  },
+  close() {
+    store.set('mbsk_welcome_off', $('wl-hide').checked);
+    $('welcome').classList.remove('open'); if (this.prev && this.prev.focus) this.prev.focus();
+  },
+  init() {
+    $('wl-go').onclick = $('wl-x').onclick = () => this.close();
+    $('welcome').addEventListener('click', e => { if (e.target.id === 'welcome') this.close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('welcome').classList.contains('open')) this.close(); });
+    if (!store.get('mbsk_welcome_off', false) && !location.hash.includes('itin')) this.open();
+  }
+};
+
 async function loadData() {
   // 1) lokality.csv vedľa stránky (ľahká aktualizácia), 2) vložená kópia
   if (location.protocol.startsWith('http') && CONFIG.csvUrl) {
@@ -2415,6 +2525,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // najprv zoznam a filtre — tie nesmú závisieť od mapy
   try { renderFilters(); renderTable(); renderItinerary(); }
   catch (e) { showStatus('Chyba pri zobrazení zoznamu: ' + e.message, true); console.error(e); }
+  try { Welcome.init(); } catch (e) { console.error(e); }
   try { initMap(); renderMap({ fit: !!state.sharedIds }); }
   catch (e) {
     console.error(e); map = null;

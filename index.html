@@ -179,16 +179,18 @@ body.light .icon-btn.on{color:#a16207}
 .empty{text-align:center;padding:28px;color:var(--text2)}
 
 @media(max-width:760px){
-  thead{display:none}
-  table,tbody,tr,td{display:block;width:100%}
-  tr{padding:12px 14px;border-bottom:1px solid var(--line)}
-  td{border:0;padding:2px 0}
-  td.c-country,td.c-city,td.c-sub{display:inline;font-size:12px;color:var(--text2)}
-  td.c-city::before{content:" · "}
-  td.c-sub::before{content:" · "}
-  td.c-cat{margin:6px 0 4px}
-  td.c-acts{margin-top:8px}
-  td.c-rate{margin-top:6px}
+  /* mobil: rovnaká tabuľka, posúvanie do strany, názov miesta ostáva pripnutý vľavo */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+  table{width:max-content;min-width:100%}
+  th,td{padding:8px 9px;font-size:12.5px}
+  td{white-space:nowrap}
+  td.c-name{white-space:normal;width:44vw;min-width:150px;max-width:210px}
+  th:first-child,td.c-name{position:sticky;left:0;z-index:2;background:var(--card);box-shadow:1px 0 0 var(--line)}
+  th:first-child{background:var(--card2);z-index:3}
+  tbody tr:hover td.c-name{background:var(--card)}
+  td.c-name .loc-name{font-size:13px}
+  td.c-cat .chip, td.c-cat span{white-space:nowrap}
+  .acts .icon-btn{width:30px;height:30px}
   .site-header{position:static}
   .header-inner{padding:10px 14px}
   .container{padding:14px 12px 40px}
@@ -2056,7 +2058,7 @@ function renderTable() {
   tb.innerHTML = items.length ? items.map(p => {
     const on = state.starred.has(p.id);
     return `<tr>
-      <td>${nameLink(p)}${moreVideos(p)}${stayInfo(p)}${p.gpsOk ? '' : '<div class="warn-tag">⚠ poloha na overenie</div>'}</td>
+      <td class="c-name">${nameLink(p)}${moreVideos(p)}${stayInfo(p)}${p.gpsOk ? '' : '<div class="warn-tag">⚠ poloha na overenie</div>'}</td>
       <td class="c-country">${flagImg(p.country)} ${esc(p.country)}</td>
       <td class="c-city">${esc(p.city || '—')}</td>
       <td class="c-cat"><span class="cat" style="${catColor(p.cat)}">${CATEGORIES[p.cat] ? CATEGORIES[p.cat][0] + ' ' : ''}${esc(p.cat)}</span>${p.sub ? `<div class="sub">${esc(p.sub)}</div>` : ''}</td>

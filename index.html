@@ -29,6 +29,7 @@ body.light{
   --shadow:0 8px 24px rgba(15,23,42,.07);
 }
 *{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
 a{color:var(--accent)}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -146,6 +147,7 @@ tbody tr:hover{background:var(--accent-soft)}
 .more-vids{font-size:12px;color:var(--text2);margin-top:3px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
 .more-vids a{color:var(--yt);font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums}
 .more-vids a:hover{text-decoration:underline}
+.mv-more{display:none;border:1px solid var(--line2);background:var(--card2);color:var(--text2);border-radius:7px;font-size:11px;padding:0 6px;cursor:pointer}
 .sub{color:var(--text2);font-size:12px}
 .cat{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:600;border:1px solid;white-space:nowrap}
 .vids{display:flex;flex-wrap:wrap;gap:4px}
@@ -182,9 +184,16 @@ body.light .icon-btn.on{color:#a16207}
   /* mobil: rovnaká tabuľka, posúvanie do strany, názov miesta ostáva pripnutý vľavo */
   .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
   table{width:max-content;min-width:100%}
-  th,td{padding:8px 9px;font-size:12.5px}
+  th,td{padding:7px 8px;font-size:12.5px}
+  th{font-size:9.5px}
   td{white-space:nowrap}
-  td.c-name{white-space:normal;width:44vw;min-width:150px;max-width:210px}
+  td.c-name{white-space:normal;width:52vw;min-width:170px;max-width:240px;line-height:1.3}
+  td.c-name .ti{width:16px;height:16px;margin-left:3px;vertical-align:-3px}
+  td.c-name .more-vids,td.c-name .stay{display:inline-flex;margin:2px 8px 0 0;font-size:11.5px;gap:2px 6px}
+  td.c-name .mv-lbl,td.c-name .pl-long,td.c-name .price{display:none}
+  td.c-name .play{font-size:10px}
+  td.c-name .more-vids:not(.all) a:nth-of-type(n+3){display:none}
+  td.c-name .more-vids:not(.all) .mv-more{display:inline-block}
   th:first-child,td.c-name{position:sticky;left:0;z-index:2;background:var(--card);box-shadow:1px 0 0 var(--line)}
   th:first-child{background:var(--card2);z-index:3}
   tbody tr:hover td.c-name{background:var(--card)}
@@ -373,6 +382,14 @@ footer{max-width:1200px;margin:0 auto;padding:0 20px 30px;font-size:12px;color:v
       <span id="range">–</span>
       <span class="row">
         <button type="button" class="btn sm" id="csv-export">⬇ Export CSV (výber)</button>
+        <label class="note" for="sort-sel">Zoradiť:</label>
+        <select id="sort-sel">
+          <option value="popular">Najobľúbenejšie</option>
+          <option value="rating">Najlepšie hodnotené</option>
+          <option value="name">Názov A → Z</option>
+          <option value="country">Krajina</option>
+          <option value="videos">Počet videí</option>
+        </select>
         <label for="page-size">Na stranu:</label>
         <select id="page-size"><option>30</option><option>50</option><option>100</option><option value="all">Všetky</option></select>
       </span>
@@ -1921,7 +1938,7 @@ const state = {
   places: [], byId: new Map(),
   countries: new Set(), cities: new Set(), cats: new Set(), subs: new Set(), types: new Set(), query: '',
   onlyStarred: false, sharedIds: null,
-  countrySort: 'count', sortField: 'country', sortDir: 1, page: 1, pageSize: 30,
+  countrySort: 'count', sortField: 'popular', sortDir: -1, page: 1, pageSize: 30,
   starred: new Set(store.get('mbsk_itinerary', [])),
   tiles: store.get('mbsk_tiles', 'classic'), mapLang: store.get('mbsk_maplang', 'sk'), cluster: true, showGray: true, mapSize: 'normal'
 };
@@ -1953,7 +1970,7 @@ function activeList() {
 function sortedList() {
   const f = state.sortField, d = state.sortDir;
   return activeList().sort((a, b) => {
-    const c = f === 'videos' ? (a.videos.length - b.videos.length) : f === 'rating' ? (Votes.score(a) - Votes.score(b)) : String(a[f] || '').localeCompare(String(b[f] || ''), 'sk', { sensitivity: 'base' });
+    const c = f === 'popular' ? (popScore(a) - popScore(b)) : f === 'videos' ? (a.videos.length - b.videos.length) : f === 'rating' ? (Votes.score(a) - Votes.score(b)) : String(a[f] || '').localeCompare(String(b[f] || ''), 'sk', { sensitivity: 'base' });
     return c * d || a.name.localeCompare(b.name, 'sk');
   });
 }
@@ -2018,14 +2035,14 @@ function renderTags(wrap, items, set, prefix, onChange) {
 /* ================= UI: TABUĽKA ================= */
 function videoChips(p, max) {
   const vs = max ? p.videos.slice(0, max) : p.videos;
-  let h = vs.map(v => `<a class="vchip" href="${esc(v.url)}" target="_blank" rel="noopener" title="Otvoriť video v čase ${fmtTime(v.t)}">▶ ${fmtTime(v.t)}</a>`).join('');
+  let h = vs.map(v => `<a class="vchip" data-vk="${p.id}" href="${esc(v.url)}" target="_blank" rel="noopener" title="Otvoriť video v čase ${fmtTime(v.t)}">▶ ${fmtTime(v.t)}</a>`).join('');
   if (max && p.videos.length > max) h += `<button type="button" class="vchip" data-more="${p.id}">+${p.videos.length - max}</button>`;
   return h || '<span class="sub">—</span>';
 }
 function nameLink(p) {
   const v = p.videos[0];
   if (!v) return `<div class="loc-name">${esc(p.name)}</div>`;
-  return `<a class="loc-name loc-link" href="${esc(v.url)}" target="_blank" rel="noopener" title="Pozrieť vo videu (${fmtTime(v.t)})">${esc(p.name)} <span class="play" aria-hidden="true">▶</span></a>${typeTag(v)}${availTag(v)}`;
+  return `<a class="loc-name loc-link" data-vk="${p.id}" href="${esc(v.url)}" target="_blank" rel="noopener" title="Pozrieť vo videu (${fmtTime(v.t)})">${esc(p.name)} <span class="play" aria-hidden="true">▶</span></a>${typeTag(v)}${availTag(v)}`;
 }
 function availTag(v) {
   if (!v || !v.av) return '';
@@ -2034,13 +2051,13 @@ function availTag(v) {
 }
 function moreVideos(p) {
   if (p.videos.length < 2) return '';
-  return `<div class="more-vids"><span>aj v ďalších videách:</span> ${p.videos.slice(1).map(v => `<a href="${esc(v.url)}" target="_blank" rel="noopener"${v.av || v.typ ? ` title="${esc([v.typ, v.av].filter(Boolean).join(' · '))}"` : ''}>▶ ${fmtTime(v.t)}${v.typ ? ` <span class="typ-${TYPES[v.typ].rank}" style="vertical-align:-2px">${typeIcon(TYPES[v.typ].rank, 11)}</span>` : ''}${v.av ? ' ⚠' : ''}</a>`).join(' ')}</div>`;
+  return `<div class="more-vids"><span class="mv-lbl">aj v ďalších videách:</span> ${p.videos.slice(1).map(v => `<a data-vk="${p.id}" href="${esc(v.url)}" target="_blank" rel="noopener"${v.av || v.typ ? ` title="${esc([v.typ, v.av].filter(Boolean).join(' · '))}"` : ''}>▶ ${fmtTime(v.t)}${v.typ ? ` <span class="typ-${TYPES[v.typ].rank}" style="vertical-align:-2px">${typeIcon(TYPES[v.typ].rank, 11)}</span>` : ''}${v.av ? ' ⚠' : ''}</a>`).join(' ')}${p.videos.length > 3 ? `<button type="button" class="mv-more" aria-label="Ukázať všetky videá">+${p.videos.length - 3}</button>` : ''}</div>`;
 }
 function isStay(p) { return p.cat === 'Ubytovanie'; }
 function pricesUrl(p) { return 'https://www.google.com/travel/hotels?q=' + encodeURIComponent([p.name, p.city, p.country].filter(Boolean).join(' ')); }
 function stayInfo(p) {
   if (!isStay(p)) return '';
-  return `<div class="stay">${p.price ? `<span class="price" title="Cena, ktorú som platil — orientačne">💶 ${esc(p.price)} / noc</span>` : ''}<a class="price-link" href="${esc(pricesUrl(p))}" target="_blank" rel="noopener" title="Porovnať aktuálne ceny z viacerých stránok (Google Hotels)">Porovnať ceny ↗</a></div>`;
+  return `<div class="stay">${p.price ? `<span class="price" title="Cena, ktorú som platil — orientačne">💶 ${esc(p.price)} / noc</span>` : ''}<a class="price-link" href="${esc(pricesUrl(p))}" target="_blank" rel="noopener" title="Porovnať aktuálne ceny z viacerých stránok (Google Hotels)">Porovnať<span class="pl-long"> ceny</span> ↗</a></div>`;
 }
 function gmapsUrl(p) { // podľa názvu → Google otvorí konkrétny podnik (adresa, recenzie, navigácia)
   const name = p.name.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
@@ -2085,6 +2102,8 @@ function renderTable() {
     s.textContent = state.sortField === f ? (state.sortDir > 0 ? '↑' : '↓') : '';
     b.parentElement.setAttribute('aria-sort', state.sortField === f ? (state.sortDir > 0 ? 'ascending' : 'descending') : 'none');
   });
+  const ss = $('sort-sel');
+  if (ss) { if (![...ss.options].some(o => o.value === state.sortField)) { if (!ss.querySelector('[data-tmp]')) ss.insertAdjacentHTML('beforeend', '<option data-tmp value="">—</option>'); ss.value = ''; } else ss.value = state.sortField; }
 }
 
 /* ================= MAPA ================= */
@@ -2364,9 +2383,10 @@ function bind() {
   });
   document.querySelectorAll('th button').forEach(b => b.onclick = () => {
     const f = b.dataset.sort;
-    state.sortDir = state.sortField === f ? -state.sortDir : (f === 'videos' || f === 'rating' ? -1 : 1);
+    state.sortDir = state.sortField === f ? -state.sortDir : (f === 'videos' || f === 'rating' || f === 'popular' ? -1 : 1);
     state.sortField = f; renderTable();
   });
+  $('sort-sel').onchange = e => { const f = e.target.value; if (!f) return; state.sortField = f; state.sortDir = (f === 'name' || f === 'country') ? 1 : -1; state.page = 1; renderTable(); };
   $('page-size').onchange = e => { state.pageSize = e.target.value === 'all' ? 'all' : +e.target.value; state.page = 1; renderTable(); };
   $('csv-export').onclick = exportCsv;
 
@@ -2418,8 +2438,16 @@ const Votes = {
     if (!this.on) return;
     try {
       const r = await fetch(CONFIG.votes.url + '/rest/v1/rpc/bm_tallies', { method: 'POST', headers: this.hdr(), body: '{}' });
-      if (r.ok) for (const t of await r.json()) this.tally.set(t.k, { up: t.up, down: t.down });
+      if (r.ok) for (const t of await r.json()) this.tally.set(t.k, { up: t.up, down: t.down, clicks: t.clicks || 0 });
     } catch (e) { console.warn('Hodnotenia sa nenačítali', e); }
+  },
+  clicks(p) { const t = this.tally.get(this.key(p)); return t && t.clicks || 0; },
+  click(p) {
+    const k = this.key(p), today = new Date().toISOString().slice(0, 10), seen = store.get('bm_clicked', {});
+    if (seen[k] === today) return;
+    seen[k] = today; store.set('bm_clicked', seen);
+    const t = this.tally.get(k) || { up: 0, down: 0, clicks: 0 }; t.clicks = (t.clicks || 0) + 1; this.tally.set(k, t);
+    if (this.on) fetch(CONFIG.votes.url + '/rest/v1/rpc/bm_click', { method: 'POST', headers: this.hdr(), body: JSON.stringify({ p_k: k, p_voter: this.voter }), keepalive: true }).catch(() => {});
   },
   async cast(p, v) {
     const k = this.key(p), old = this.mine[k] || 0, nv = old === v ? 0 : v;
@@ -2434,6 +2462,16 @@ const Votes = {
     }
   }
 };
+/* obľúbenosť: kliknutia (+ hlasy); pri rovnosti viac videí a dlhšia návšteva */
+function popScore(p) {
+  const c = Votes.counts(p);
+  return Votes.clicks(p) * 10 + (c.up - c.down) * 3 + Math.min(p.videos.length, 5) * .5 + (p.typ ? TYPES[p.typ].rank : 0) * .1;
+}
+document.addEventListener('click', e => {
+  const mm = e.target.closest('.mv-more'); if (mm) { mm.parentElement.classList.add('all'); return; }
+  const a = e.target.closest('a[data-vk]'); if (!a) return;
+  const p = state.byId.get(a.dataset.vk); if (p) Votes.click(p);
+});
 function rateTip(p) {
   const c = Votes.counts(p), n = c.up + c.down;
   const head = `<b>Kvalita informácií vo videu</b><div class="tip-sub">Ukázalo ti video o tomto mieste to, čo si potreboval vedieť?</div>`;

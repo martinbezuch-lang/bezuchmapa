@@ -113,6 +113,14 @@ button,input,select,textarea{font:inherit;color:inherit}
 .table-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12.5px;color:var(--text2)}
 .map-lang{display:inline-flex;align-items:center;gap:4px;font-size:13px}
 .map-lang.off{opacity:.45}
+#player{position:fixed;inset:0;z-index:10001;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(5,10,20,.75);backdrop-filter:blur(3px)}
+#player.open{display:flex}
+.pl-box{width:min(960px,100%);background:var(--card);border:1px solid var(--line2);border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pl-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px 10px 16px}
+.pl-title{font-weight:700;font-size:15px}.pl-sub{font-size:12px;color:var(--text2)}
+.pl-acts{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.pl-frame{position:relative;aspect-ratio:16/9;background:#000}
+.pl-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 #welcome{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(5,10,20,.62);backdrop-filter:blur(3px)}
 #welcome.open{display:flex}
 .wl-box{position:relative;width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--card);color:var(--text);border:1px solid var(--line2);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.45);padding:24px 24px 18px}
@@ -223,6 +231,13 @@ footer{max-width:1200px;margin:0 auto;padding:0 20px 30px;font-size:12px;color:v
 </style>
 </head>
 <body>
+<div id="player" role="dialog" aria-modal="true" aria-labelledby="pl-title">
+  <div class="pl-box">
+    <div class="pl-head"><div><div id="pl-title" class="pl-title"></div><div id="pl-sub" class="pl-sub"></div></div>
+      <div class="pl-acts"><a id="pl-yt" class="btn sm" href="#" target="_blank" rel="noopener">Otvoriť na YouTube ↗</a><button type="button" class="wl-close" id="pl-x" aria-label="Zavrieť" style="position:static">×</button></div></div>
+    <div id="pl-frame" class="pl-frame"></div>
+  </div>
+</div>
 <div id="welcome" role="dialog" aria-modal="true" aria-labelledby="wl-title">
   <div class="wl-box">
     <button type="button" class="wl-close" id="wl-x" aria-label="Zavrieť">×</button>
@@ -1148,7 +1163,7 @@ W Koh Samui,Thajsko,Koh Samui,Ubytovanie,Rezort,https://youtu.be/dWxN-ROHpno?t=7
 Wat Plai Laem,Thajsko,Koh Samui,Pamiatky a kultúra,Chrám / Svätyňa,https://youtu.be/DruaFlyYB4k?t=456,"9,5712837","100,0672883",0:07:36,,"12,2",Detailná návšteva,
 Wat Plai Laem,Thajsko,Koh Samui,Pamiatky a kultúra,Chrám / Svätyňa,https://youtu.be/bZvADR93l5g?t=1414,"9,5712837","100,0672883",0:23:34,,"20,4",Detailná návšteva,
 Sumalee 02• 3-izbová vila s bazénom,Thajsko,Koh Samui,Ubytovanie,Vila,https://youtu.be/KezB1aJP1ec?t=0,"9,5212823","100,0365817",0:00:00,,"21,8",Detailná návšteva,
-Silver beah Koh Samui,Thajsko,Koh Samui,Pláže a ostrovy,Pláž,https://youtu.be/KezB1aJP1ec?t=1306,"9,4777557","100,0662606",0:21:46,,"8,2",Detailná návšteva,
+Silver beah Koh Samui,Thajsko,Koh Samui,Pláže a ostrovy,Pláž,https://youtu.be/KezB1aJP1ec?t=1303,"9,4777557","100,0662606",0:21:43,,"8,2",Detailná návšteva,
 Koh Samui Airport,Thajsko,Koh Samui,Doprava a služby,Letisko,https://youtu.be/yQf5e2UqJZU?t=80,"9,5484366","100,0630279",0:01:20,,"11,4",Prechádzam okolo,
 Hin Ta and Hin Yai Rocks,Thajsko,Koh Samui,Príroda,Hory,https://youtu.be/2kvCvGh6Wvc?t=270,"9,4521891","100,0395383",0:04:30,,"2,7",Krátka zastávka,
 Maenam Beach,Thajsko,Koh Samui,Pláže a ostrovy,Pláž,https://youtu.be/bZvADR93l5g?t=195,"9,570046","100,000347",0:03:15,,"7,0",Prechádzam okolo,
@@ -1170,9 +1185,9 @@ Castello Di Bellagio Pattaya,Thajsko,Na Chom Thian,Jedlo a pitie,Reštaurácia,h
 Silla Patong Boutique Hotel,Thajsko,Phuket,Ubytovanie,Hotel,https://youtu.be/NdhKkSW-QH4?t=3083,"7,890508","98,293835",0:51:23,,"1,6",Krátka zastávka,
 808 Night Club,Thajsko,Pattaya,Nočný život a zábava,Nočný klub,https://youtu.be/_meyLrikzMk?t=1396,"12,923594","100,8824376",0:23:16,,"6,7",Detailná návšteva,
 Aeras Condominium,Thajsko,Pattaya,Ubytovanie,Apartmán / Rezidencia,https://youtu.be/QZ5J7rPK9v8?t=1790,"12,8713709","100,8903936",0:29:50,,"10,2",Detailná návšteva,
-Akara Hotel Pattaya,Thajsko,Pattaya,Jedlo a pitie,Bar,https://youtu.be/7vE87mor_sw?t=1185,"12,953033","100,8892175",0:19:45,,"7,5",Detailná návšteva,
-Akara Pattaya,Thajsko,Pattaya,Jedlo a pitie,Skybar,https://youtu.be/qEj9PWaVee0?t=3255,"12,953033","100,8892175",0:54:15,,"14,8",Detailná návšteva,
-Alexa Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/JZA8PBUsnAI?t=0,"12,8506093","100,9010596",0:00:00,,0,Prechádzam okolo,
+Akara Hotel Pattaya,Thajsko,Pattaya,Jedlo a pitie,Skybar,https://youtu.be/7vE87mor_sw?t=1117,"12,953033","100,8892175",0:18:37,,"7,5",Detailná návšteva,
+Akara Hotel Pattaya,Thajsko,Pattaya,Jedlo a pitie,Skybar,https://youtu.be/qEj9PWaVee0?t=3322,"12,953033","100,8892175",0:55:22,,"14,8",Detailná návšteva,
+Alexa Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/JZA8PBUsnAI?t=0,"12,8506093","100,9010596",0:00:00,,"9,1",Detailná návšteva,
 Ambassador City Jomtien,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/MJDPZbdPycQ?t=0,"12,8389886","100,9078521",0:00:00,,"15,3",Detailná návšteva,
 Ambassador City Jomtien,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/JZA8PBUsnAI?t=1627,"12,8389886","100,9078521",0:27:07,,"4,9",Detailná návšteva,
 Bali Hai Pier (Pattaya),Thajsko,Pattaya,Doprava a služby,Prístav,https://youtu.be/T2BvFfjC79A?t=1770,"12,9254363","100,8679032",0:29:30,,"0,5",Prechádzam okolo,
@@ -1181,11 +1196,10 @@ Bang Saray Beach,Thajsko,Pattaya,Pláže a ostrovy,Pláž,https://youtu.be/f3gno
 Baywalk Residence,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/ONzcKhT0BxA?t=4056,"12,9292999","100,8772186",1:07:36,,"2,4",Krátka zastávka,
 Beach Road,Thajsko,Pattaya,Mestá a nákupy,Ulica / Námestie,https://youtu.be/ONzcKhT0BxA?t=3290,"12,931968","100,879644",0:54:50,,"12,8",Detailná návšteva,
 Beach Road,Thajsko,Pattaya,Mestá a nákupy,Ulica / Námestie,https://youtu.be/lLvemx49nck?t=445,"12,931968","100,879644",0:07:25,,"6,9",Detailná návšteva,
-Biblos Beach Club Pattaya,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/pi9yFT0RgHk?t=60,"12,962193","100,8853762",0:01:00,,"11,0",Prechádzam okolo,
 Blue Dragon Cafe & Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/If27ftDz2kA?t=2007,"12,9697559","100,886483",0:33:27,,"10,6",Detailná návšteva,
 Bombus Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/qEj9PWaVee0?t=1995,"12,962193","100,8853762",0:33:15,,"13,0",Detailná návšteva,
 Breezeo,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/ONzcKhT0BxA?t=1786,"12,9237492","100,8589853",0:29:46,,"3,1",Detailná návšteva,
-Byblos Beach Club & Hotel,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/T2BvFfjC79A?t=0,"12,9248769","100,8695414",0:00:00,,0,Prechádzam okolo,
+Byblos Beach Club & Hotel,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/T2BvFfjC79A?t=0,"12,9248769","100,8695414",0:00:00,,"4,0",Detailná návšteva,
 Centara Grand Mirage Beach Resort Pattaya,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/qEj9PWaVee0?t=765,"12,9585521","100,8859705",0:12:45,,"20,5",Detailná návšteva,
 Central Pattaya (Beach Road),Thajsko,Pattaya,Pláže a ostrovy,Pláž,https://youtu.be/T2BvFfjC79A?t=1560,"12,9341283","100,8839734",0:26:00,,"3,5",Prechádzam okolo,
 Centric Sea Pattaya,Thajsko,Pattaya,Ubytovanie,Apartmán / Rezidencia,https://youtu.be/y7s-jnm4Ac8?t=0,"12,9395321","100,8883189",0:00:00,,"9,9",Detailná návšteva,
@@ -1197,7 +1211,7 @@ Club Insomnia,Thajsko,Pattaya,Nočný život a zábava,Nočný klub,https://yout
 Columbia Pictures Aquaverse,Thajsko,Pattaya,Atrakcie a výhľady,Vodný park,https://youtu.be/f3gnohj3JFo?t=167,"12,7844267","100,9142196",0:02:47,,"0,9",Prechádzam okolo,
 D Varee Jomtien Beach Pattaya,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/QZ5J7rPK9v8?t=710,"12,8803309","100,8845873",0:11:50,,"18,0",Detailná návšteva,
 Darkness Bar,Thajsko,Pattaya,Jedlo a pitie,Bar,https://youtu.be/T2BvFfjC79A?t=746,"12,9382078","100,8870324",0:12:26,,"11,1",Detailná návšteva,
-Fat Coco Seafood Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/7vE87mor_sw?t=294,"12,9456437","100,8851878",0:04:54,,"14,8",Detailná návšteva,
+Fat Coco Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/7vE87mor_sw?t=294,"12,945591","100,884969",0:04:54,,"14,8",Detailná návšteva,
 FROST Magical Ice of Siam,Thajsko,Pattaya,Atrakcie a výhľady,Zábavný park,https://youtu.be/If27ftDz2kA?t=0,"12,9695648","100,975938",0:00:00,,"5,1",Detailná návšteva,
 FROST Magical Ice of Siam,Thajsko,Pattaya,Atrakcie a výhľady,Zábavný park,https://youtu.be/qVdp04b5pek?t=1000,"12,9695648","100,975938",0:16:40,,"27,3",Detailná návšteva,
 GREAT&GRAND Sweet Destination,Thajsko,Pattaya,Jedlo a pitie,Kaviareň,https://youtu.be/qVdp04b5pek?t=0,"12,9702033","100,9748022",0:00:00,,"5,5",Detailná návšteva,
@@ -1208,10 +1222,10 @@ Jomtien Night Market,Thajsko,Pattaya,Mestá a nákupy,Trh,https://youtu.be/ucF6v
 Karmaa Club,Thajsko,Pattaya,Nočný život a zábava,Nočný klub,https://youtu.be/_meyLrikzMk?t=214,"12,9249211","100,8708557",0:03:34,,"4,8",Detailná návšteva,
 Khao Chi Chan (Buddha Mountain),Thajsko,Pattaya,Pamiatky a kultúra,Historická pamiatka,https://youtu.be/f3gnohj3JFo?t=223,"12,764865","100,9557312",0:03:43,,"1,2",Krátka zastávka,
 La La Lake,Thajsko,Pattaya,Jedlo a pitie,Kaviareň,https://youtu.be/LG9KQ0DWo94?t=0,"12,8508325","100,945076",0:00:00,,0,Prechádzam okolo,18+ (prihlásenie)
-Lay Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/pi9yFT0RgHk?t=0,"12,9406394","100,884487",0:00:00,,"1,0",Krátka zastávka,
-Lay Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/T2BvFfjC79A?t=1412,"12,9406394","100,884487",0:23:32,,"2,5",Krátka zastávka,
+Lay Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/pi9yFT0RgHk?t=0,"12,9406394","100,884487",0:00:00,,"19,5",Detailná návšteva,
+Lay Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/T2BvFfjC79A?t=1350,"12,9406394","100,884487",0:22:30,,"2,5",Krátka zastávka,
 LK Emerald Beach,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/3KGh_gjQORU?t=855,"12,9530776","100,8836143",0:14:15,,"2,3",Krátka zastávka,
-LK Emerald Hotel,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/qEj9PWaVee0?t=2775,"12,9530776","100,8836143",0:46:15,,"8,0",Detailná návšteva,
+LK Emerald Hotel,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/qEj9PWaVee0?t=3030,"12,9530776","100,8836143",0:50:30,,"8,0",Detailná návšteva,
 LK The Empress / LK President,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/7vE87mor_sw?t=1637,"12,9316549","100,879949",0:27:17,,"0,1",Prechádzam okolo,
 Lucifer 2.0,Thajsko,Pattaya,Nočný život a zábava,Nočný klub,https://youtu.be/_meyLrikzMk?t=1249,"12,92638","100,872951",0:20:49,,"2,5",Krátka zastávka,
 Marroc Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/LG9KQ0DWo94?t=879,"12,962193","100,8853762",0:14:39,,"5,0",Detailná návšteva,18+ (prihlásenie)
@@ -1228,7 +1242,7 @@ Pattaya Sign (Pratumnak Hill),Thajsko,Pattaya,Atrakcie a výhľady,Vyhliadka / V
 Pupen Seafood Restaurant,Thajsko,Pattaya,Jedlo a pitie,Reštaurácia,https://youtu.be/f3gnohj3JFo?t=981,"12,861438","100,895524",0:16:21,,"5,9",Detailná návšteva,
 Ramayana Water Park,Thajsko,Pattaya,Atrakcie a výhľady,Vodný park,https://youtu.be/f3gnohj3JFo?t=546,"12,750536","100,962101",0:09:06,,"3,3",Detailná návšteva,
 Republic Club & Lounge,Thajsko,Pattaya,Nočný život a zábava,Nočný klub,https://youtu.be/_meyLrikzMk?t=750,"12,9255324","100,8723632",0:12:30,,"8,3",Detailná návšteva,
-Roof 21,Thajsko,Pattaya,Jedlo a pitie,Bar,https://youtu.be/LG9KQ0DWo94?t=1178,"12,8819655","100,8868471",0:19:38,,"5,3",Detailná návšteva,18+ (prihlásenie)
+Roof 21,Thajsko,Pattaya,Jedlo a pitie,Bar (dnes už nefunguje),https://youtu.be/LG9KQ0DWo94?t=1178,"12,8819655","100,8868471",0:19:38,,"5,3",Detailná návšteva,18+ (prihlásenie)
 Royal Cliff Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/ONzcKhT0BxA?t=822,"12,9235621","100,8600327",0:13:42,,"16,1",Detailná návšteva,
 Royal Cliff Beach Hotel,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/ONzcKhT0BxA?t=642,"12,9235621","100,8600327",0:10:42,,"3,0",Krátka zastávka,
 Sai Kaew Beach,Thajsko,Pattaya,Pláže a ostrovy,Pláž,https://youtu.be/y7s-jnm4Ac8?t=1932,"12,742418","100,841254",0:32:12,,"7,8",Detailná návšteva,
@@ -1293,17 +1307,14 @@ Walking Street Pattaya,Thajsko,Pattaya,Príroda,Park / Záhrada,https://youtu.be
 Pattaya Beach Road (Pouličná časť),Thajsko,Pattaya,Mestá a nákupy,Ulica / Námestie,https://youtu.be/k-CkpBr3vCk?t=195,"12,931968","100,879644",0:03:15,,"35,8",Detailná návšteva,
 Riviera Ocean Drive,Thajsko,Pattaya,Ubytovanie,Apartmán / Rezidencia,https://youtu.be/ovXG0tQCQEY?t=5,"12,8943973","100,877393",0:00:05,,"44,9",Detailná návšteva,
 Copacabana Beach Jomtien,Thajsko,Pattaya,Ubytovanie,Apartmán / Rezidencia,https://youtu.be/jbpZBo3iEvk?t=905,"12,8916425","100,8752065",0:15:05,,"21,9",Detailná návšteva,
-Alexa Beach Club (Pattaya),Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/ONzcKhT0BxA?t=15,"12,850701","100,901068",0:00:15,,"7,2",Detailná návšteva,
-Blue Dragon Beach Club,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/pi9yFT0RgHk?t=1860,"12,90601","100,8754136",0:31:00,,"4,0",Prechádzam okolo,
 Koh Larn,Thajsko,Pattaya,Pláže a ostrovy,Ostrov,https://youtu.be/T2BvFfjC79A?t=300,"12,9286584","100,8678241",0:05:00,,"7,4",Prechádzam okolo,
-Royal Cliff Beach Hotel,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/PwHbs9kFtCo?t=2760,"12,9235373","100,8599858",0:46:00,,"31,0",Detailná návšteva,
-Biblos Beach Club Pattaya,Thajsko,Pattaya,Jedlo a pitie,Plážový klub,https://youtu.be/3zIDWdP6rbg?t=2010,"12,90601","100,8754136",0:33:30,,"5,5",Prechádzam okolo,
+Royal Cliff Beach Hotel,Thajsko,Pattaya,Ubytovanie,Hotel,https://youtu.be/PwHbs9kFtCo?t=2797,"12,9235373","100,8599858",0:46:37,,"31,0",Detailná návšteva,
 Koh Raet,Thajsko,Pattaya,Pláže a ostrovy,Ostrov,https://youtu.be/qVdp04b5pek?t=330,"12,9198167","100,7849761",0:05:30,,"11,2",Prechádzam okolo,
 Bali Hai Pier (Pattaya),Thajsko,Pattaya,Doprava a služby,Prístav,https://youtu.be/Lr_ZO-h7g2I?t=570,"12,9277442","100,8679231",0:09:30,,"1,5",Krátka zastávka,
 Tha Dan Pier,Thajsko,Phang Nga,Doprava a služby,Prístav,https://youtu.be/UjD0V7W3g3Q?t=848,"8,4009829","98,5132382",0:14:08,,"9,0",Detailná návšteva,
 Koh Panyi (Ko Panyee),Thajsko,Phang Nga Bay,Pláže a ostrovy,Ostrov,https://youtu.be/UjD0V7W3g3Q?t=1386,"8,335856","98,502896",0:23:06,,"6,9",Detailná návšteva,
 Koh Panyi Floating Village Pier,Thajsko,Phang Nga Bay,Doprava a služby,Prístav,https://youtu.be/HlvQhb9TqNE?t=45,"8,335856","98,502896",0:00:45,,"29,2",Detailná návšteva,
-Koh Panyi Floating School,Thajsko,Phang Nga Bay,Doprava a služby,Požičovňa / Služby,https://youtu.be/ZWhKbLxPV0I?t=150,"8,335856","98,502896",0:02:30,,"41,5",Detailná návšteva,
+Koh Panyi Floating School,Thajsko,Phang Nga Bay,Doprava a služby,Požičovňa / Služby,https://youtu.be/ZWhKbLxPV0I?t=184,"8,335856","98,502896",0:03:04,,"41,5",Detailná návšteva,
 Koh Panyi Floating Mosque,Thajsko,Phang Nga Bay,Pamiatky a kultúra,Chrám / Svätyňa,https://youtu.be/fyoig7I1P-c?t=555,"8,335856","98,502896",0:09:15,,"20,8",Detailná návšteva,
 Phi Phi Islands,Thajsko,Phi Phi,Pláže a ostrovy,Ostrov,https://youtu.be/AIAfh32ch70?t=300,"7,7522403","98,7766827",0:05:00,,"9,3",Detailná návšteva,
 Muay Thai Camp Phi Phi,Thajsko,Phi Phi,Atrakcie a výhľady,Šport / Štadión,https://youtu.be/AIAfh32ch70?t=860,"7,7620858","98,7700369",0:14:20,,"30,7",Detailná návšteva,
@@ -1457,11 +1468,11 @@ Virgin Trading Post,USA,Utah / Virgin,Mestá a nákupy,Nákupné centrum / Obcho
 Bonneville Salt Flats,USA,Utah / Wendover,Príroda,Park / Záhrada,https://youtu.be/ZZLmrf1XQ9M?t=6,"40,740006","-113,6815662",0:00:06,,"19,9",Detailná návšteva,
 Da Nang Beach,Vietnam,Da Nang,Pláže a ostrovy,Pláž,https://youtu.be/ATeTdktwIfo?t=90,"16,06778","108,22083",0:01:30,,"0,7",Prechádzam okolo,
 Sandy Beach Non Nuoc Resort,Vietnam,Da Nang,Ubytovanie,Rezort,https://youtu.be/ATeTdktwIfo?t=130,"15,9980738","108,2698245",0:02:10,,"26,8",Detailná návšteva,
-Hanoi Train Street,Vietnam,Hanoj,Mestá a nákupy,Ulica / Námestie,https://youtu.be/1kdc1m0zX7o?t=70,"21,0242144","105,8410943",0:01:10,,"5,1",Detailná návšteva,
-Hoan Kiem Lake,Vietnam,Hanoj,Príroda,Jazero / Rieka,https://youtu.be/1kdc1m0zX7o?t=375,"21,0288313","105,8525357",0:06:15,,"12,1",Detailná návšteva,
-Aurora Central Hotel,Vietnam,Hanoj,Ubytovanie,Hotel,https://youtu.be/1kdc1m0zX7o?t=2270,"21,03498","105,85317",0:37:50,,"2,2",Krátka zastávka,
+Hanoi Train Street,Vietnam,Hanoj,Mestá a nákupy,Ulica / Námestie,https://youtu.be/1kdc1m0zX7o?t=775,"21,0242144","105,8410943",0:12:55,,"5,1",Detailná návšteva,
+Hoan Kiem Lake,Vietnam,Hanoj,Príroda,Jazero / Rieka,https://youtu.be/1kdc1m0zX7o?t=402,"21,0288313","105,8525357",0:06:42,,"12,1",Detailná návšteva,
+Aurora Central Hotel,Vietnam,Hanoj,Ubytovanie,Hotel,https://youtu.be/1kdc1m0zX7o?t=2323,"21,03498","105,85317",0:38:43,,"2,2",Krátka zastávka,
 Aurora Central Hotel (Jacuzzi / Terasa),Vietnam,Hanoj,Ubytovanie,Hotel,https://youtu.be/nUfwv12SYUw?t=15,"21,03498","105,85317",0:00:15,,"14,2",Detailná návšteva,
-Moonlight Sky Bar,Vietnam,Hanoj,Jedlo a pitie,Skybar,https://youtu.be/nUfwv12SYUw?t=870,"21,0283334","105,854041",0:14:30,,"17,0",Detailná návšteva,
+Moonlight Sky Bar,Vietnam,Hanoj,Jedlo a pitie,Skybar,https://youtu.be/nUfwv12SYUw?t=819,"21,0283334","105,854041",0:13:39,,"17,0",Detailná návšteva,
 Ta Hien Street (Beer Street),Vietnam,Hanoj,Nočný život a zábava,Nočná ulica,https://youtu.be/nUfwv12SYUw?t=1890,"21,0347541","105,8521754",0:31:30,,"6,5",Detailná návšteva,
 Bùi Viện Walking Street,Vietnam,Hočiminovo Mesto (Saigon),Mestá a nákupy,Ulica / Námestie,https://youtu.be/D2n-0-SSLjo?t=2860,"10,7677522","106,6924769",0:47:40,,"3,3",Detailná návšteva,
 Crescent Mall,Vietnam,Hočiminovo Mesto (Saigon),Mestá a nákupy,Nákupné centrum / Obchod,https://youtu.be/D2n-0-SSLjo?t=2065,"10,728995","106,718917",0:34:25,,"2,3",Krátka zastávka,
@@ -1474,21 +1485,21 @@ Landmark 81,Vietnam,Hočiminovo Mesto (Saigon),Atrakcie a výhľady,Vyhliadka / 
 War Remnants Museum,Vietnam,Hočiminovo Mesto (Saigon),Pamiatky a kultúra,Múzeum,https://youtu.be/O-KWeIY5JwQ?t=0,"10,7795","106,6921",0:00:00,,"24,8",Detailná návšteva,18+ (prihlásenie)
 Bến Thành Market,Vietnam,Hočiminovo Mesto (Saigon),Mestá a nákupy,Trh,https://youtu.be/njKPuVwkraM?t=1358,"10,7725","106,698",0:22:38,,"14,4",Detailná návšteva,
 Bitexco Financial Tower,Vietnam,Hočiminovo Mesto (Saigon),Atrakcie a výhľady,Vyhliadka / Veža,https://youtu.be/LyE36TIh-B4?t=830,"10,7716","106,7044",0:13:50,,"26,2",Detailná návšteva,
-Bùi Viện Walking Street,Vietnam,Hočiminovo Mesto (Saigon),Nočný život a zábava,Nočná ulica,https://youtu.be/uNPtso8d4O4?t=40,"10,7677522","106,6924769",0:00:40,,"12,7",Detailná návšteva,
-Diamond Plaza,Vietnam,Hočiminovo Mesto (Saigon),Mestá a nákupy,Nákupné centrum / Obchod,https://youtu.be/njKPuVwkraM?t=335,"10,7805","106,6994",0:05:35,,"17,1",Detailná návšteva,
+Bùi Viện Walking Street,Vietnam,Hočiminovo Mesto (Saigon),Nočný život a zábava,Nočná ulica,https://youtu.be/uNPtso8d4O4?t=2446,"10,7677522","106,6924769",0:40:46,,"12,7",Detailná návšteva,
+Diamond Plaza,Vietnam,Hočiminovo Mesto (Saigon),Mestá a nákupy,Nákupné centrum / Obchod,https://youtu.be/njKPuVwkraM?t=249,"10,7805","106,6994",0:04:09,,"17,1",Detailná návšteva,
 Ho Chi Minh City Hall (Radnica),Vietnam,Hočiminovo Mesto (Saigon),Pamiatky a kultúra,Historická pamiatka,https://youtu.be/njKPuVwkraM?t=85,"10,7769","106,7009",0:01:25,,"3,0",Krátka zastávka,
 Landmark 81,Vietnam,Hočiminovo Mesto (Saigon),Atrakcie a výhľady,Vyhliadka / Veža,https://youtu.be/uNPtso8d4O4?t=800,"10,795","106,7218",0:13:20,,"0,8",Prechádzam okolo,
-Notre-Dame Cathedral Saigon,Vietnam,Hočiminovo Mesto (Saigon),Pamiatky a kultúra,Chrám / Svätyňa,https://youtu.be/njKPuVwkraM?t=265,"10,7798","106,699",0:04:25,,"0,2",Prechádzam okolo,
+Notre-Dame Cathedral Saigon,Vietnam,Hočiminovo Mesto (Saigon),Pamiatky a kultúra,Chrám / Svätyňa,https://youtu.be/njKPuVwkraM?t=249,"10,7798","106,699",0:04:09,,"0,2",Prechádzam okolo,
 Saigon Central Post Office,Vietnam,Hočiminovo Mesto (Saigon),Pamiatky a kultúra,Historická pamiatka,https://youtu.be/njKPuVwkraM?t=280,"10,7799557","106,6999921",0:04:40,,"0,9",Prechádzam okolo,
 Social Club Saigon (Hotel des Arts),Vietnam,Hočiminovo Mesto (Saigon),Jedlo a pitie,Skybar,https://youtu.be/uNPtso8d4O4?t=2115,"10,7782","106,6967",0:35:15,,"8,8",Detailná návšteva,
 Thảo Điền,Vietnam,Hočiminovo Mesto (Saigon),Mestá a nákupy,Mesto / Štvrť,https://youtu.be/uNPtso8d4O4?t=850,"10,8033","106,734",0:14:10,,"7,5",Detailná návšteva,
 Hội An Ancient Town,Vietnam,Hội An,Pamiatky a kultúra,Historická pamiatka,https://youtu.be/Y2BTtn1En7g?t=70,"15,877951","108,32399",0:01:10,,"21,5",Detailná návšteva,
-Hội An Market,Vietnam,Hội An,Mestá a nákupy,Trh,https://youtu.be/Y2BTtn1En7g?t=1360,"15,8795863","108,3319406",0:22:40,,"7,3",Detailná návšteva,
+Hội An Market,Vietnam,Hội An,Mestá a nákupy,Trh,https://youtu.be/Y2BTtn1En7g?t=1647,"15,8795863","108,3319406",0:27:27,,"7,3",Detailná návšteva,
 Hội An Riverside,Vietnam,Hội An,Pláže a ostrovy,Pláž,https://youtu.be/uYA1Ke5iGwM?t=215,"15,87944","108,335",0:03:35,,"2,7",Krátka zastávka,
 Riverside Resort Hội An,Vietnam,Hội An,Ubytovanie,Rezort,https://youtu.be/uYA1Ke5iGwM?t=375,"15,8744836","108,3235617",0:06:15,,"36,8",Detailná návšteva,
 Rồng Mây Glass Bridge (Rong May),Vietnam,Lai Châu (Sapa / Ô Quý Hồ),Atrakcie a výhľady,Vyhliadka / Veža,https://youtu.be/m_znry1ecoY?t=10,"22,3723762","103,7571369",0:00:10,,"29,8",Detailná návšteva,
 Sapa,Vietnam,Lao Cai,Mestá a nákupy,Mesto / Štvrť,https://youtu.be/dG_JA2JEe08?t=0,"22,3312368","103,8291918",0:00:00,,0,Detailná návšteva,
-Lào Cai / Hranica s Čínou,Vietnam,Lào Cai,Doprava a služby,Hraničný prechod,https://youtu.be/RzTOKn7EX9Q?t=195,"22,48556","103,97066",0:03:15,,"22,8",Detailná návšteva,
+Lào Cai / Hranica s Čínou,Vietnam,Lào Cai,Doprava a služby,Hraničný prechod,https://youtu.be/RzTOKn7EX9Q?t=114,"22,48556","103,97066",0:01:54,,"22,8",Detailná návšteva,
 Aquatopia Water Park,Vietnam,Phu Quoc,Atrakcie a výhľady,Vodný park,https://youtu.be/plPR2H6782c?t=0,"9,956411","104,015861",0:00:00,,"16,9",Detailná návšteva,
 Bai Sao Beach,Vietnam,Phu Quoc,Pláže a ostrovy,Pláž,https://youtu.be/plPR2H6782c?t=2740,"10,052473","104,0351928",0:45:40,,"4,3",Detailná návšteva,
 Diamond Bar,Vietnam,Phu Quoc,Jedlo a pitie,Bar,https://youtu.be/JW9F5QNcKQE?t=1070,"10,22409","103,97156",0:17:50,,"5,2",Detailná návšteva,
@@ -1511,13 +1522,13 @@ Roaring Timbers,Vietnam,Phu Quoc,Atrakcie a výhľady,Zábavný park,https://you
 Ban Mong Alpine Coaster,Vietnam,Sapa,Atrakcie a výhľady,Zábavný park,https://youtu.be/N0CwszNVcMQ?t=1464,"22,32229","103,86656",0:24:24,,"12,6",Detailná návšteva,
 Cát Cát Village (Két Két),Vietnam,Sapa,Mestá a nákupy,Mesto / Štvrť,https://youtu.be/RzTOKn7EX9Q?t=1560,"22,328533","103,83468",0:26:00,,"18,0",Detailná návšteva,
 Fansipan Legend,Vietnam,Sapa,Atrakcie a výhľady,Lanovka / Zipline,https://youtu.be/T9kCI90h0L0?t=15,"22,337076","103,824322",0:00:15,,"1,6",Krátka zastávka,
-Fansipan Legend Cable Car Station,Vietnam,Sapa,Atrakcie a výhľady,Lanovka / Zipline,https://youtu.be/8jCurneDK6Q?t=400,"22,33708","103,82432",0:06:40,,"38,3",Detailná návšteva,
+Fansipan Legend Cable Car Station,Vietnam,Sapa,Atrakcie a výhľady,Lanovka / Zipline,https://youtu.be/8jCurneDK6Q?t=537,"22,33708","103,82432",0:08:57,,"38,3",Detailná návšteva,
 Hotel de la Coupole - MGallery,Vietnam,Sapa,Ubytovanie,Hotel,https://youtu.be/T9kCI90h0L0?t=110,"22,33477","103,84038",0:01:50,,"3,8",Detailná návšteva,
 Moana Sapa,Vietnam,Sapa,Atrakcie a výhľady,Vyhliadka / Veža,https://youtu.be/N0CwszNVcMQ?t=393,"22,3273625","103,8462808",0:06:33,,"17,9",Detailná návšteva,
 Sapa,Vietnam,Sapa,Mestá a nákupy,Mesto / Štvrť,https://youtu.be/aGuSL4TH00U?t=1,"22,340505","103,8457002",0:00:01,,"31,0",Detailná návšteva,
-Sapa,Vietnam,Sapa,Mestá a nákupy,Mesto / Štvrť,https://youtu.be/RzTOKn7EX9Q?t=105,"22,33337","103,84266",0:01:45,,"1,5",Prechádzam okolo,
+Sapa,Vietnam,Sapa,Mestá a nákupy,Mesto / Štvrť,https://youtu.be/RzTOKn7EX9Q?t=491,"22,33337","103,84266",0:08:11,,"1,5",Prechádzam okolo,
 Sapa (Moana Sapa),Vietnam,Sapa,Atrakcie a výhľady,Vyhliadka / Veža,https://youtu.be/014bDVo_ic4?t=395,"22,32736","103,84628",0:06:35,,"23,4",Detailná návšteva,
-Sky Gate of O Quy Ho,Vietnam,Sapa,Mestá a nákupy,Mesto / Štvrť,https://youtu.be/T9kCI90h0L0,"20,2579161","105,8806205",,,"0,2",Prechádzam okolo,
+Sky Gate of O Quy Ho,Vietnam,Sapa,Mestá a nákupy,Mesto / Štvrť,https://youtu.be/T9kCI90h0L0?t=428,"20,2579161","105,8806205",0:07:08,,"0,2",Prechádzam okolo,
 Sun Plaza Sapa,Vietnam,Sapa,Mestá a nákupy,Nákupné centrum / Obchod,https://youtu.be/T9kCI90h0L0?t=340,"22,3345583","103,8404825",0:05:40,,"21,3",Detailná návšteva,
 The View Sapa Hotel,Vietnam,Sapa,Ubytovanie,Hotel,https://youtu.be/N0CwszNVcMQ?t=0,"22,33337","103,84266",0:00:00,,"6,5",Detailná návšteva,
 "Trò chơi ZIPLINE, SWING GAME",Vietnam,Sapa,Mestá a nákupy,Mesto / Štvrť,https://youtu.be/AQ3IrEygjOs?t=1,"22,33337","103,84266",0:00:01,,"29,0",Detailná návšteva,
@@ -2471,7 +2482,34 @@ document.addEventListener('click', e => {
   const mm = e.target.closest('.mv-more'); if (mm) { mm.parentElement.classList.add('all'); return; }
   const a = e.target.closest('a[data-vk]'); if (!a) return;
   const p = state.byId.get(a.dataset.vk); if (p) Votes.click(p);
+  if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return; // nová karta podľa želania
+  if (Player.open(a.href, p)) e.preventDefault();
 });
+
+/* ================= PREHRÁVAČ NA STRÁNKE =================
+   Aplikácia YouTube často ignoruje čas v odkaze (pokračuje tam, kde človek skončil).
+   Vložený prehrávač začne vždy presne v zadanom čase. */
+const Player = {
+  parse(url) { const m = String(url).match(/(?:youtu\.be\/|v=)([\w-]{11})/); if (!m) return null; const t = String(url).match(/[?&]t=(\d+)/); return { id: m[1], t: t ? +t[1] : 0 }; },
+  open(url, p) {
+    const v = this.parse(url); if (!v) return false;
+    const vid = p && p.videos.find(x => x.url.includes(v.id));
+    if (vid && vid.av && /18/.test(vid.av)) return false; // 18+ sa nedá vložiť – otvorí sa YouTube
+    const w = $('player');
+    $('pl-title').textContent = p ? p.name : 'Video';
+    $('pl-sub').textContent = (p ? [p.city, p.country].filter(Boolean).join(', ') + ' · ' : '') + 'od ' + fmtTime(v.t);
+    $('pl-yt').href = `https://www.youtube.com/watch?v=${v.id}&t=${v.t}s`;
+    $('pl-frame').innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?start=${v.t}&autoplay=1&rel=0&playsinline=1" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    w.classList.add('open'); this.prev = document.activeElement; $('pl-x').focus();
+    return true;
+  },
+  close() { $('player').classList.remove('open'); $('pl-frame').innerHTML = ''; if (this.prev && this.prev.focus) this.prev.focus(); },
+  init() {
+    $('pl-x').onclick = () => this.close();
+    $('player').addEventListener('click', e => { if (e.target.id === 'player') this.close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('player').classList.contains('open')) this.close(); });
+  }
+};
 function rateTip(p) {
   const c = Votes.counts(p), n = c.up + c.down;
   const head = `<b>Kvalita informácií vo videu</b><div class="tip-sub">Ukázalo ti video o tomto mieste to, čo si potreboval vedieť?</div>`;
@@ -2565,7 +2603,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // najprv zoznam a filtre — tie nesmú závisieť od mapy
   try { renderFilters(); renderTable(); renderItinerary(); }
   catch (e) { showStatus('Chyba pri zobrazení zoznamu: ' + e.message, true); console.error(e); }
-  try { Welcome.init(); } catch (e) { console.error(e); }
+  try { Welcome.init(); Player.init(); } catch (e) { console.error(e); }
   try { initMap(); renderMap({ fit: !!state.sharedIds }); }
   catch (e) {
     console.error(e); map = null;

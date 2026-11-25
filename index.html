@@ -30,6 +30,7 @@ body.light{
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.card,.container,main{min-width:0}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
 a{color:var(--accent)}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -120,6 +121,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .pl-title{font-weight:700;font-size:15px}.pl-sub{font-size:12px;color:var(--text2)}
 .pl-acts{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .pl-frame{position:relative;aspect-ratio:16/9;background:#000}
+.pl-adult{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center;color:#eee;font-size:14px}
+.pl-adult p{max-width:420px;margin:0 0 6px;color:#bbb}.pl-time{color:#fff;font-size:18px}
 .pl-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 #welcome{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(5,10,20,.62);backdrop-filter:blur(3px)}
 #welcome.open{display:flex}
@@ -2474,9 +2477,16 @@ const Votes = {
   }
 };
 /* obľúbenosť: kliknutia (+ hlasy); pri rovnosti viac videí a dlhšia návšteva */
+/* Obľúbené: pláže a plážové kluby – poradie krajín určuje poradie v zozname (prvá = najvyššie) */
+const FEATURED = [['Thajsko'], ['Indonézia', 'Bali'], ['Maldivy'], ['Dominikánska republika'], ['Filipíny']];
+function featTier(p) {
+  if (!(p.cat === 'Pláže a ostrovy' || /plážový klub/i.test(p.sub || ''))) return 0;
+  const i = FEATURED.findIndex(([c, city]) => p.country === c && (!city || (p.city || '').includes(city)));
+  return i < 0 ? 0 : FEATURED.length - i;
+}
 function popScore(p) {
   const c = Votes.counts(p);
-  return Votes.clicks(p) * 10 + (c.up - c.down) * 3 + Math.min(p.videos.length, 5) * .5 + (p.typ ? TYPES[p.typ].rank : 0) * .1;
+  return featTier(p) * 100 + Votes.clicks(p) * 10 + (c.up - c.down) * 3 + Math.min(p.videos.length, 5) * .5 + (p.typ ? TYPES[p.typ].rank : 0) * .1;
 }
 document.addEventListener('click', e => {
   const mm = e.target.closest('.mv-more'); if (mm) { mm.parentElement.classList.add('all'); return; }
@@ -2494,12 +2504,12 @@ const Player = {
   open(url, p) {
     const v = this.parse(url); if (!v) return false;
     const vid = p && p.videos.find(x => x.url.includes(v.id));
-    if (vid && vid.av && /18/.test(vid.av)) return false; // 18+ sa nedá vložiť – otvorí sa YouTube
+    const adult = !!(vid && vid.av && /18/.test(vid.av)); // 18+ sa nedá vložiť – ponúkneme YouTube s presným časom
     const w = $('player');
     $('pl-title').textContent = p ? p.name : 'Video';
     $('pl-sub').textContent = (p ? [p.city, p.country].filter(Boolean).join(', ') + ' · ' : '') + 'od ' + fmtTime(v.t);
     $('pl-yt').href = `https://www.youtube.com/watch?v=${v.id}&t=${v.t}s`;
-    $('pl-frame').innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?start=${v.t}&autoplay=1&rel=0&playsinline=1" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    $('pl-frame').innerHTML = adult ? `<div class="pl-adult"><div style="font-size:34px">🔞</div><b>Toto video je na YouTube 18+</b><p>YouTube ho nedovolí prehrať na inej stránke. Otvor ho na YouTube a ak by nezačalo správne, pretoč na <b class="pl-time">${fmtTime(v.t)}</b>.</p><a class="btn primary-solid" href="https://www.youtube.com/watch?v=${v.id}&t=${v.t}s" target="_blank" rel="noopener">▶ Otvoriť na YouTube od ${fmtTime(v.t)}</a></div>` : `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?start=${v.t}&autoplay=1&rel=0&playsinline=1" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
     w.classList.add('open'); this.prev = document.activeElement; $('pl-x').focus();
     return true;
   },
